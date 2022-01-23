@@ -87,7 +87,12 @@
 
 				if(is_array($notice))
 				{
-					$html->set('notice', '<div class="informer '.$notice['color'].' topifon">'.$notice['text'].'</div><div class="space"></div>');
+					global $device;
+
+					if($device == '!mobile')
+						$html->set('notice', '<div class="informer '.$notice['color'].' topifon">'.$notice['text'].'</div><div class="space"></div>');
+					else
+						$html->set('notice', '<div class="heading-style-1 container"><div class="smaller-text color-'.$notice['color'].'-light">'.$notice['text'].'</div><div class="heading-decoration bg-'.$notice['color'].'-light" style="margin-top: 0px"></div></div>');
 				}else
 					$html->set('notice', '');
 
@@ -125,9 +130,9 @@
 
 		public static function route($server, $inc, $go, $all = false)
 		{
-			global $start_point;
+			global $device, $start_point;
 
-			$dir = '';
+			$dir = $device == '!mobile' ? '' : 'megp/';
 			$use = true;
 
 			if(in_array($inc, array('plugins', 'ftp', 'console', 'graph', 'copy', 'web')))
@@ -208,20 +213,20 @@
 
 		public static function outhtml($text, $time = 3, $url = false, $cache = false)
 		{
-			global $mcache, $html, $cfg;
+			global $device, $mcache, $html, $cfg;
 
 			if($cache)
 				$mcache->delete($cache);
 
-			$tpl = '';
+			$tpl = $device == '!mobile' ? '' : '/megp';
 
 			$html->get('out');
 
 				$html->set('title', $cfg['name']);
 				$html->set('home', $cfg['http']);
-				$html->set('css', $cfg['http'].$tplsl.'/css/');
-				$html->set('js', $cfg['http'].$tplsl.'/js/');
-				$html->set('img', $cfg['http'].$tplsl.'/images/');
+				$html->set('css', $cfg['http'].'template'.$tpl.'/css/');
+				$html->set('js', $cfg['http'].'template'.$tpl.'/js/');
+				$html->set('img', $cfg['http'].'template'.$tpl.'/images/');
 				$html->set('text', $text);
 
 			$html->pack('out');
@@ -312,7 +317,7 @@
 
 			$text = str_replace(
 				array('[name]', '[text]', '[http]', '[img]', '[css]'),
-				array($cfg['name'], $text, $cfg['http'], $cfg['http'].$tplsl.'images/', $cfg['http'].$tplsl.'css/'),
+				array($cfg['name'], $text, $cfg['http'], $cfg['http'].'template/images/', $cfg['http'].'template/css/'),
 				$tpl
 			);
 
@@ -435,7 +440,9 @@
 				if($go)
 					sys::outjs(array('e' => sys::text('output', 'auth')));
 
-				$link = 'user/section/lk';
+				global $device;
+
+				$link = $device == '!mobile' ? 'user/section/lk' : '';
 
 				exit(header('Refresh: 0; URL='.$cfg['http'].$link));
 			}
@@ -452,7 +459,9 @@
 				if($go)
 					sys::outjs(array('e' => sys::text('output', 'noauth')));
 
-				$link = 'user/section/auth';
+				global $device;
+
+				$link = $device == '!mobile' ? 'user/section/auth' : 'auth';
 
 				exit(header('Refresh: 0; URL='.$cfg['http'].$link));
 			}
@@ -634,7 +643,7 @@
 			  "<div><b class='spoiler'>Посмотреть содержимое</b><div class='spoiler_main'><pre><code>\\1</code></pre></div></div>",
 			  "<blockquote><p>\\1</p></blockquote>",
 			  "<a href='\\1' target='_blank'>\\2</a>",
-			  "<a href='\\1' target='_blank' style='display: block;'><img src='".$cfg['url'].$tplsl."images/help_screenshot.png' alt='Изображение'></a>",
+			  "<a href='\\1' target='_blank' style='display: block;'><img src='".$cfg['url']."template/images/help_screenshot.png' alt='Изображение'></a>",
 			  "<a href='\\2' target='_blank'> \\2</a>"
 			);
 
@@ -991,9 +1000,9 @@
 			$fileimg = file_exists(TPL.'/images/country/'.$name.'.png');
 
 			if($fileimg)
-				return $cfg['http'].$tplsl.'images/country/'.$name.'.png';
+				return $cfg['http'].'template/images/country/'.$name.'.png';
 
-			return $cfg['http'].$tplsl.'images/country/none.png';
+			return $cfg['http'].'template/images/country/none.png';
 		}
 
 		public static function ipproxy()
@@ -1200,61 +1209,61 @@
 
 				case 'off':
 					if($get == 'img')
-						return $cfg['http'].$tplsl.'images/status/off.jpg';
+						return $cfg['http'].'template/images/status/off.jpg';
 
 					return 'Статус: <span style="color: #C46666;">выключен</span>';
 
 				case 'start':
 					if($get == 'img')
-						return $cfg['http'].$tplsl.'images/status/start.gif';
+						return $cfg['http'].'template/images/status/start.gif';
 
 					return 'Статус: <span style="color: #22B93C;">запускается</span>';
 
 				case 'restart':
 					if($get == 'img')
-						return $cfg['http'].$tplsl.'images/status/restart.gif';
+						return $cfg['http'].'template/images/status/restart.gif';
 
 					return 'Статус: <span style="color: #22B93C;">перезапускается</span>';
 
 				case 'change':
 					if($get == 'img')
-						return $cfg['http'].$tplsl.'images/status/change.gif';
+						return $cfg['http'].'template/images/status/change.gif';
 
 					return 'Статус: <span style="color: #52BEFC;">меняется карта</span>';
 
 				case 'install':
 					if($get == 'img')
-						return $cfg['http'].$tplsl.'images/status/install.gif';
+						return $cfg['http'].'template/images/status/install.gif';
 
 					return 'Статус: <span style="color: #22B93C;">устанавливается</span>';
 
 				case 'reinstall':
 					if($get == 'img')
-						return $cfg['http'].$tplsl.'images/status/reinstall.gif';
+						return $cfg['http'].'template/images/status/reinstall.gif';
 
 					return 'Статус: <span style="color: #22B93C;">переустанавливается</span>';
 
 				case 'update':
 					if($get == 'img')
-						return $cfg['http'].$tplsl.'images/status/update.gif';
+						return $cfg['http'].'template/images/status/update.gif';
 
 					return 'Статус: <span style="color: #F2CF41;">обновляется</span>';
 
 				case 'recovery':
 					if($get == 'img')
-						return $cfg['http'].$tplsl.'images/status/recovery.gif';
+						return $cfg['http'].'template/images/status/recovery.gif';
 
 					return 'Статус: <span style="color: #22B93C;">восстанавливается</span>';
 
 				case 'overdue':
 					if($get == 'img')
-						return $cfg['http'].$tplsl.'images/status/overdue.jpg';
+						return $cfg['http'].'template/images/status/overdue.jpg';
 
 					return 'Статус: просрочен';
 
 				case 'blocked':
 					if($get == 'img')
-						return $cfg['http'].$tplsl.'images/status/blocked.jpg';
+						return $cfg['http'].'template/images/status/blocked.jpg';
 
 					return 'Статус: заблокирован';
 			}
